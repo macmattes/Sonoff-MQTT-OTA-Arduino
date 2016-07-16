@@ -17,7 +17,8 @@
  *                        | | | | | |                     Gnd
 */
 
-#define PROJECT                "sonoff"
+#define PROJECT                "button"
+#define DEVICE                 "0"
 #define VERSION                0x01000D00   // 1.0.13
 #define CFG_HOLDER             0x20160520   // Change this value to load default configurations
 
@@ -56,7 +57,7 @@
 #define SUB_PREFIX             "cmnd"
 #define PUB_PREFIX             "stat"
 #define MQTT_GRPTOPIC          PROJECT"s"   // Group topic
-#define MQTT_TOPIC             PROJECT
+#define MQTT_TOPIC             PROJECT"_"DEVICE
 
 // Application
 #define MQTT_SUBTOPIC          "POWER"
@@ -74,7 +75,8 @@
 #define LED_PIN                13           // GPIO 13 = Green Led (0 = On, 1 = Off) - Sonoff
 //#define LED_PIN                16           // NodeMCU
 #define REL_PIN                12           // GPIO 12 = Red Led and Relay (0 = Off, 1 = On)
-#define KEY_PIN                0            // GPIO 00 = Button
+#define KEY_PIN0                0            // GPIO 00 = Button
+#define KEY_PIN1                14            // GPIO 00 = Button
 #define PRESSED                0
 #define NOT_PRESSED            1
 
@@ -143,10 +145,15 @@ WiFiUDP portUDP;   // syslog
 int blinks = 1;
 uint8_t blinkstate = 1;
 
-uint8_t lastbutton = NOT_PRESSED;
-uint8_t holdcount = 0;
-uint8_t multiwindow = 0;
-uint8_t multipress = 0;
+uint8_t lastbutton0 = NOT_PRESSED;
+uint8_t holdcount0 = 0;
+uint8_t multiwindow0 = 0;
+uint8_t multipress0 = 0;
+
+uint8_t lastbutton1 = NOT_PRESSED;
+uint8_t holdcount1 = 0;
+uint8_t multiwindow1 = 0;
+uint8_t multipress1 = 0;
 
 /*********************************************************************************************\
  * Syslog
@@ -538,7 +545,8 @@ const char commands[6][14] PROGMEM = {
 
 void stateloop()
 {
-  uint8_t button;
+  uint8_t button0;
+  uint8_t button1;
   char scmnd[20], log[30];
   
   timerxs = millis() + (1000 / STATES);
@@ -548,35 +556,67 @@ void stateloop()
     every_second();
   }
 
-  button = digitalRead(KEY_PIN);
-  if ((button == PRESSED) && (lastbutton == NOT_PRESSED)) {
-    multipress = (multiwindow) ? multipress +1 : 1;
-    sprintf_P(log, PSTR("APP: Multipress %d"), multipress);
+  button0 = digitalRead(KEY_PIN);
+  if ((button0 == PRESSED) && (lastbutton0 == NOT_PRESSED)) {
+    multipress0 = (multiwindow0) ? multipress0 +1 : 1;
+    sprintf_P(log, PSTR("APP: Multipress %d"), multipress0);
     addLog(LOG_LEVEL_DEBUG, log);
     blinks = 1;
-    multiwindow = STATES /2;         // 1/2 second multi press window
+    multiwindow0 = STATES /2;         // 1/2 second multi press window
   }
-  lastbutton = button;
-  if (button == NOT_PRESSED) {
-    holdcount = 0;
+  lastbutton0 = button0;
+  if (button0 == NOT_PRESSED) {
+    holdcount0 = 0;
   } else {
-    holdcount++;
-    if (holdcount == (STATES *4)) {  // 4 seconds button hold
+    holdcount0++;
+    if (holdcount0 == (STATES *4)) {  // 4 seconds button hold
       strcpy_P(scmnd, commands[0]);
-      multipress = 0;
+      multipress0 = 0;
       do_cmnd(scmnd);
     }
   }
-  if (multiwindow) {
-    multiwindow--;
+  if (multiwindow0) {
+    multiwindow0--;
   } else {
-    if ((!holdcount) && (multipress >= 1) && (multipress <= 5)) {
-      strcpy_P(scmnd, commands[multipress]);
-      if (strcmp(sysCfg.mqtt_topic2,"0") && (multipress == 1) && mqttClient.connected())
+    if ((!holdcount0) && (multipress0 >= 1) && (multipress0 <= 5)) {
+      strcpy_P(scmnd, commands[multipress0]);
+      if (strcmp(sysCfg.mqtt_topic2,"0") && (multipress0 == 1) && mqttClient.connected())
         send_button(scmnd);          // Execute command via MQTT using ButtonTopic to sync external clients
       else
         do_cmnd(scmnd);              // Execute command internally 
-      multipress = 0;
+      multipress0 = 0;
+    }
+  }
+
+button1 = digitalRead(KEY_PIN);
+  if ((button1 == PRESSED) && (lastbutton1 == NOT_PRESSED)) {
+    multipress1 = (multiwindow1) ? multipress1 +1 : 1;
+    sprintf_P(log, PSTR("APP: Multipress %d"), multipress);
+    addLog(LOG_LEVEL_DEBUG, log);
+    blinks = 1;
+    multiwindow1 = STATES /2;         // 1/2 second multi press window
+  }
+  lastbutton1 = button1;
+  if (button1 == NOT_PRESSED) {
+    holdcount1 = 0;
+  } else {
+    holdcount1++;
+    if (holdcount1 == (STATES *4)) {  // 4 seconds button hold
+      strcpy_P(scmnd, commands[0]);
+      multipress1 = 0;
+      do_cmnd(scmnd);
+    }
+  }
+  if (multiwindow1) {
+    multiwindow1--;
+  } else {
+    if ((!holdcount1) && (multipress1 >= 1) && (multipress1 <= 5)) {
+      strcpy_P(scmnd, commands[multipress1]);
+      if (strcmp(sysCfg.mqtt_topic2,"0") && (multipress1 == 1) && mqttClient.connected())
+        send_button(scmnd);          // Execute command via MQTT using ButtonTopic to sync external clients
+      else
+        do_cmnd(scmnd);              // Execute command internally 
+      multipress1 = 0;
     }
   }
 
