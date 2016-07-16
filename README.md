@@ -4,7 +4,7 @@ Provide ESP8266 based [itead Sonoff](https://www.itead.cc/sonoff-wifi-wireless-s
 
 See [Sonoff-MQTT-OTA](https://github.com/arendst/Sonoff-MQTT-OTA) for the ```esp-open-sdk``` version.
 ## Prerequisite
-Install the ESP8266 Arduino development environment from [esp8266 Arduino](https://github.com/esp8266/Arduino). The software is tested on a Windows PC with Arduino IDE versions 1.6.5r5, 1.6.8 and 1.6.9 and esp8266 Arduino versions 2.1.0 and 2.2.0.
+Install the ESP8266 Arduino development environment from [esp8266 Arduino](https://github.com/esp8266/Arduino). The software is tested on a Windows PC with Arduino IDE versions 1.6.5r5, 1.6.8 and 1.6.9 and esp8266 Arduino versions 2.1.0, 2.2.0 and 2.3.0.
 
 - I prefer a standalone version of the IDE allowing easy ESP8266 file manipulation. This can be achieved by downloading the Arduino IDE ZIP file for non admin install. After unzipping and before executing ```arduino.exe``` add an empty directory called ```portable```
 - Follow the procedure to install the ESP8266 Arduino development environment
@@ -18,8 +18,8 @@ Install php and a local web server (ie apache) for OTA and copy directory ```api
 
 If you want to be able to upload the OTA file from the IDE to your webserver perform the following changes to the Arduino IDE environment:
 
-- Copy file ```espupload.py``` to directory ```portable\packages\esp8266\hardware\esp8266\2.1.0\tools```
-- Replace files ```boards.txt``` and ```platform.txt``` in directory ```portable\packages\esp8266\hardware\esp8266\2.1.0```
+- Copy file ```espupload.py``` to directory ```portable\packages\esp8266\hardware\esp8266\2.3.0\tools```
+- Replace files ```boards.txt``` and ```platform.txt``` in directory ```portable\packages\esp8266\hardware\esp8266\2.3.0```
 
 This will provide an additional option ```Tools - Upload Using: OTA_upload```.
 ## Compile and upload
@@ -48,8 +48,6 @@ Verify and upload an OTA image to your web server with option ```Upload Using: O
 Enable debug messages by selecting option Tools Debug Port: Serial.
 ## Usage
 The button on sonoff provides the following features:
-
-- a short press toggles the relay. This will blink the LED twice and sends a MQTT status message like ```stat/sonoff/POWER on```
 
 - a short press toggles the relay either by sending a MQTT message like ```cmnd/sonoff/light 2``` or directly. This will blink the LED twice and sends a MQTT status message like ```stat/sonoff/LIGHT on```
 - two short presses toggles the relay. This will blink the LED twice and sends a MQTT status message like ```stat/sonoff/POWER on```
@@ -88,6 +86,11 @@ light toggle | Toggle power
 light 1 | Turn power On
 light 0 | Turn power Off
 light 2 | Toggle power
+ledstate | Show current led state as On or Off
+ledstate on | Show power state on led
+ledstate off | Do not show power state on led
+ledstate 1 | Show power state on led
+ledstate 0 | Do not show power state on led
 status | Show abbreviated status information
 status 1 | Show more status information
 status 2 | Show version information
@@ -148,9 +151,9 @@ If the same topic has been defined to more than one sonoff an individual sonoff 
 - Use the group topic to address several sonoffs with one (restricted) MQTT command.
 
 ## Modified kaku power socket switch using ESP-12F
-Using parts from itead (5V power supply), aliexpress (Different 5V power supply, ESP-12F and 5V to 3V3 step down) and ebay (5V relay) I modified broken 434MHz kaku power socket switches to Wifi wkaku power socket switches.
+Using parts from itead (5V power supply), aliexpress (Different 5V power supply, ESP-12F and 5V to 3V3 step down) and ebay (5V relay) I modified broken 434MHz kaku power socket switches type PAR-1000 to Wifi wkaku power socket switches.
 
 <img alt="Exterior" src="https://github.com/arendst/arendst.github.io/blob/master/media/wkaku1a.jpg" height="300" /> 
 <img alt="Kaku" src="https://github.com/arendst/arendst.github.io/blob/master/media/kaku2a.jpg" height="300" /> 
-<img alt="wKaku" src="https://github.com/arendst/arendst.github.io/blob/master/media/wkaku2a.jpg" height="300" /> 
-<img alt="wKaku v1.2" src="https://github.com/arendst/arendst.github.io/blob/master/media/wkaku3a.jpg" height="300" /> 
+<img alt="wKaku prototype" src="https://github.com/arendst/arendst.github.io/blob/master/media/wkaku2a.jpg" height="300" /> 
+<img alt="wKaku v1.3" src="https://github.com/arendst/arendst.github.io/blob/master/media/wkaku4a.jpg" height="300" /> 
