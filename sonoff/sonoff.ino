@@ -556,7 +556,7 @@ void stateloop()
     every_second();
   }
 
-  button0 = digitalRead(KEY_PIN);
+  button0 = digitalRead(KEY_PIN0);
   if ((button0 == PRESSED) && (lastbutton0 == NOT_PRESSED)) {
     multipress0 = (multiwindow0) ? multipress0 +1 : 1;
     sprintf_P(log, PSTR("APP: Multipress %d"), multipress0);
@@ -588,10 +588,10 @@ void stateloop()
     }
   }
 
-button1 = digitalRead(KEY_PIN);
+button1 = digitalRead(KEY_PIN1);
   if ((button1 == PRESSED) && (lastbutton1 == NOT_PRESSED)) {
     multipress1 = (multiwindow1) ? multipress1 +1 : 1;
-    sprintf_P(log, PSTR("APP: Multipress %d"), multipress);
+    sprintf_P(log, PSTR("APP: Multipress %d"), multipress1);
     addLog(LOG_LEVEL_DEBUG, log);
     blinks = 1;
     multiwindow1 = STATES /2;         // 1/2 second multi press window
